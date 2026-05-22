@@ -66,7 +66,6 @@
       filter: drop-shadow(0 8px 60px rgba(90,10,160,.45));
     }
     .card:hover { filter:drop-shadow(0 12px 80px rgba(110,20,190,.60)); }
-    .card.flipped { transform: rotateY(-180deg); }
 
     /* ── both faces ── */
     .face {
@@ -283,98 +282,88 @@
     </svg>
   </button>
 
-  <script>
-    const card      = document.getElementById('card');
-    const btn       = document.getElementById('flipBtn');
-    const label     = document.getElementById('btnLabel');
-    const scene     = document.getElementById('scene');
+    <script>
+        const card  = document.getElementById('card');
+        const btn   = document.getElementById('flipBtn');
+        const label = document.getElementById('btnLabel');
+        const scene = document.getElementById('scene');
 
-    let flipped = false;
-    let busy = false;
+        let flipped = false;
+        let busy = false;
 
-    function updateCardTransform(dx = 0, dy = 0) {
-        if (!flipped) {
+        function renderCard(dx = 0, dy = 0) {
+            let rotateY = flipped ? -180 : 0;
             card.style.transform =
-            `rotateY(${dx}deg) rotateX(${dy}deg)`;
-        }
-     }
-
-    function doFlip() {
-        if (busy) return;
-
-        busy = true;
-        flipped = !flipped;
-
-        card.classList.toggle('flipped', flipped);
-
-        // clear inline transform when flipped
-        if (flipped) {
-            card.style.transform = '';
+            `rotateY(${rotateY + dx}deg) rotateX(${dy}deg)`;
         }
 
-        label.textContent =
+        function doFlip() {
+            if (busy) return;
+            busy = true;
+            flipped = !flipped;
+            renderCard();
+            label.textContent =
             flipped ? 'Back to cover' : 'Open the letter';
-
-        btn.classList.toggle('back', flipped);
-
-        setTimeout(() => {
+            btn.classList.toggle('back', flipped);
+            setTimeout(() => {
             busy = false;
-        }, 1150);
-    }
-
-    btn.addEventListener('click', doFlip);
-    card.addEventListener('click', doFlip);
-
-    /* subtle parallax tilt on front */
-    scene.addEventListener('mousemove', (e) => {
-        if (flipped) return;
-
-        const r  = scene.getBoundingClientRect();
-
-        const dx =
-        (e.clientX - r.left - r.width / 2) / (r.width / 2);
-
-        const dy =
-        (e.clientY - r.top - r.height / 2) / (r.height / 2);
-
-        updateCardTransform(dx * 6, -dy * 5);
-    });
-
-    scene.addEventListener('mouseleave', () => {
-        if (!flipped) {
-        card.style.transform = '';
+            }, 1150);
         }
-    });
 
-    /* floating background symbols */
-    (function () {
-        const canvas = document.getElementById('floatCanvas');
-        const SYMS   = ['♡','✿','✦','✾','❀','♥','✽'];
+        btn.addEventListener('click', doFlip);
+        card.addEventListener('click', doFlip);
 
-        for (let i = 0; i < 55; i++) {
-        const el = document.createElement('span');
+        scene.addEventListener('mousemove', (e) => {
 
-        el.className = 'fsym';
+            if (flipped) return;
 
-        const size  = 8 + Math.random() * 11;
-        const dur   = 18 + Math.random() * 28;
-        const delay = -(Math.random() * dur);
+            const r = scene.getBoundingClientRect();
 
-        el.textContent =
-            SYMS[Math.floor(Math.random() * SYMS.length)];
+            const dx =
+            (e.clientX - r.left - r.width / 2) /
+            (r.width / 2);
 
-        el.style.cssText = `
-            left:${Math.random() * 100}vw;
-            bottom:-20px;
-            font-size:${size}px;
-            opacity:${0.06 + Math.random() * .11};
-            animation-duration:${dur}s;
-            animation-delay:${delay}s;
-        `;
+            const dy =
+            (e.clientY - r.top - r.height / 2) /
+            (r.height / 2);
 
-        canvas.appendChild(el);
-        }
-    })();
-  </script>
+            renderCard(dx * 6, -dy * 5);
+
+        });
+
+        scene.addEventListener('mouseleave', () => {
+
+            if (!flipped) {
+            renderCard(0, 0);
+            }
+
+        });
+
+        /* floating background symbols */
+        (function () {
+            const canvas = document.getElementById('floatCanvas');
+            const SYMS = ['♡','✿','✦','✾','❀','♥','✽'];
+            for (let i = 0; i < 55; i++) {
+            const el = document.createElement('span');
+            el.className = 'fsym';
+            const size = 8 + Math.random() * 11;
+            const dur = 18 + Math.random() * 28;
+            const delay = -(Math.random() * dur);
+
+            el.textContent =
+                SYMS[Math.floor(Math.random() * SYMS.length)];
+
+            el.style.cssText = `
+                left:${Math.random() * 100}vw;
+                bottom:-20px;
+                font-size:${size}px;
+                opacity:${0.06 + Math.random() * .11};
+                animation-duration:${dur}s;
+                animation-delay:${delay}s;
+            `;
+            canvas.appendChild(el);
+            }
+        })();
+</script>
 </body>
 </html>
