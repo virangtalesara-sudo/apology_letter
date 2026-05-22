@@ -293,14 +293,11 @@
     let busy = false;
 
     function updateCardTransform(dx = 0, dy = 0) {
-        if (flipped) {
-        card.style.transform =
-            `rotateY(-180deg) rotateX(${dy}deg)`;
-        } else {
-        card.style.transform =
+        if (!flipped) {
+            card.style.transform =
             `rotateY(${dx}deg) rotateX(${dy}deg)`;
         }
-    }
+     }
 
     function doFlip() {
         if (busy) return;
@@ -308,21 +305,20 @@
         busy = true;
         flipped = !flipped;
 
+        card.classList.toggle('flipped', flipped);
+
+        // clear inline transform when flipped
         if (flipped) {
-        card.classList.add('flipped');
-        updateCardTransform(0, 0);
-        } else {
-        card.classList.remove('flipped');
-        card.style.transform = '';
+            card.style.transform = '';
         }
 
         label.textContent =
-        flipped ? 'Back to cover' : 'Open the letter';
+            flipped ? 'Back to cover' : 'Open the letter';
 
         btn.classList.toggle('back', flipped);
 
         setTimeout(() => {
-        busy = false;
+            busy = false;
         }, 1150);
     }
 
